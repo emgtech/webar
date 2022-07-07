@@ -136,29 +136,29 @@
         }
     });
 
-    AFRAME.registerComponent('change-color-on-click', {
-        // Could use a schem to preserve the color! then simply change it on update
-        // if clicked?
-        init: function () {
-            var lastIndex = -1;
-            var COLORS = [
-            'pink',
-            'blue',
-            'yellow',
-            'red',
-            'peachpuff',
-            '#2EAFAC',
-            '#BAE'];
-            this.el.addEventListener('click', changeColor);
+    // AFRAME.registerComponent('change-color-on-click', {
+    //     // Could use a schem to preserve the color! then simply change it on update
+    //     // if clicked?
+    //     init: function () {
+    //         var lastIndex = -1;
+    //         var COLORS = [
+    //         'pink',
+    //         'blue',
+    //         'yellow',
+    //         'red',
+    //         'peachpuff',
+    //         '#2EAFAC',
+    //         '#BAE'];
+    //         this.el.addEventListener('click', changeColor);
                 
-            //this.el.addEventListener('touch', changeColor);
-            function changeColor(evt) {
-                lastIndex = (lastIndex + 1) % COLORS.length;
-                this.setAttribute('material', 'color', COLORS[lastIndex]);
-                console.log('I was clicked at: ', evt.detail.intersection.point);
-            }
-        }
-    });
+    //         //this.el.addEventListener('touch', changeColor);
+    //         function changeColor(evt) {
+    //             lastIndex = (lastIndex + 1) % COLORS.length;
+    //             this.setAttribute('material', 'color', COLORS[lastIndex]);
+    //             console.log('I was clicked at: ', evt.detail.intersection.point);
+    //         }
+    //     }
+    // });
     </script>
     <script>
         $( function() {
