@@ -54,12 +54,14 @@
       //Delete later: change line 203 to adjust Bob Blue picture
 
     function closeDialog() {
-      if (reload) {
-        window.location.reload();
-      } else {
         stopVideo();
         goOutside();
-      }
+      // if (reload) {
+      //   window.location.reload();
+      // } else {
+      //   stopVideo();
+      //   goOutside();
+      // }
       const boxes = document.querySelectorAll('.box');
           boxes.forEach((el) => el.setAttribute('visible', true));
       
