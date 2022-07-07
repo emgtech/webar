@@ -1,0 +1,245 @@
+<!doctype HTML>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    </head>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        // 2. This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
+    
+        var ytVidId = '2ZSE9TxQ-3Q';
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+        // 3. This function creates an <iframe> (and YouTube player)
+        //    after the API code downloads.
+        var player;
+        function onYouTubeIframeAPIReady() {
+          player = new YT.Player('player', {
+            height: $(document).width() * 0.80 * 0.75,
+            width: $(document).width() * 0.80,
+            videoId: ytVidId,
+            events: {
+              'onReady': onPlayerReady,
+              'onStateChange': onPlayerStateChange
+            }
+          });
+        }
+    
+        // 4. The API will call this function when the video player is ready.
+        function onPlayerReady(event) {
+          //event.target.playVideo();
+        }
+    
+        // 5. The API calls this function when the player's state changes.
+        //    The function indicates that when playing a video (state=1),
+        //    the player should play for six seconds and then stop.
+        var done = false;
+        function onPlayerStateChange(event) {
+        }
+        function stopVideo() {
+          player.stopVideo();
+        }
+      
+
+    function closeDialog() {
+      if (reload) {
+        window.location.reload();
+      } else {
+        stopVideo();
+        goOutside();
+      }
+    }
+
+    var restoreX, restoreY, restoreZ;
+    var restoreEl;
+    var reload = false;
+
+    function goInside(el) {
+
+      //Make all barrels (except el)  invisible
+      //Make all barrels and all text visible again
+
+      const boxes = document.querySelectorAll('.box');
+      boxes.forEach((boxesEl) => boxesEl.setAttribute('visible', boxesEl.id === el.id));
+
+      restoreX = el.getAttribute('position').x;
+      restoreY = el.getAttribute('position').y;
+      restoreZ = el.getAttribute('position').z;
+
+      restoreEl = el;
+    }
+
+    function goOutside() {
+
+      setTimeout(() => {
+          //Make all barrels and all text visible again
+          const boxes = document.querySelectorAll('.box');
+          boxes.forEach((el) => el.setAttribute('visible', true));
+
+      }, 3000);
+      
+      //Restore the position of the selected barrel
+      if (restoreEl) {
+        const restorePos = restoreX.toString() + ' ' + restoreY.toString() + ' ' + restoreZ.toString()
+      }
+      restoreEl = null;
+
+    }
+
+    AFRAME.registerComponent('button', {
+        init: function() {
+
+          //On click on the Chateau Points barrel, go to scan the dot code page
+            //const gltf_box1 = document.querySelector('#box1');
+            const gltf_box2 = document.querySelector('#box2');
+            const cam = document.querySelector('#camera');
+            var x = cam.getAttribute('position').x;
+            var y = cam.getAttribute('position').y;
+            var z = cam.getAttribute('position').z;
+
+            var pos = x.toString() + ' ' + (y).toString() + ' ' + (z-150).toString()
+
+           
+            /*gltf_box1.addEventListener('click', function(ev, target) {
+              goInside(gltf_box1);
+              $( "#videoDialog" ).dialog( "open" );
+              player.playVideo();
+            })*/
+
+            gltf_box2.addEventListener('click', function(ev, target) {
+              goInside(gltf_box2);
+              $( "#videoDialog" ).dialog( "open" );
+              player.playVideo();
+            })
+
+        }
+    });
+
+    AFRAME.registerComponent('change-color-on-click', {
+        // Could use a schem to preserve the color! then simply change it on update
+        // if clicked?
+        init: function () {
+            var lastIndex = -1;
+            var COLORS = [
+            'pink',
+            'blue',
+            'yellow',
+            'red',
+            'peachpuff',
+            '#2EAFAC',
+            '#BAE'];
+            this.el.addEventListener('click', changeColor);
+                
+            //this.el.addEventListener('touch', changeColor);
+            function changeColor(evt) {
+                lastIndex = (lastIndex + 1) % COLORS.length;
+                this.setAttribute('material', 'color', COLORS[lastIndex]);
+                console.log('I was clicked at: ', evt.detail.intersection.point);
+            }
+        }
+    });
+    </script>
+    <script>
+        $( function() {
+          $( "#videoDialog" ).dialog({
+            autoOpen: false,
+            height: $(document).width() * 0.80 * 0.75 + 20,
+            width: $(document).width() * 0.80 + 20,
+            close: closeDialog,
+            show: {
+              effect: "blind",
+              duration: 1000
+            },
+            hide: {
+              effect: "blind",
+              duration: 1000
+            }
+          });
+        } );
+      </script>
+    <body style='margin : 0px; overflow: hidden;'>
+          <div show="hidden" id="videoDialog" title="Dominion Energy" style="z-index: 100">
+            <div id="player"></div>
+          </div>
+        <!--video controls width="250">
+          <source src="video/2020SustainabilityReport.mp4" type="video/mp4">
+          Sorry, your browser doesn't support embedded videos.
+        </video-->
+      
+        <!-- we add detectionMode and matrixCodeType to tell AR.js to recognize barcode markers -->
+        <a-scene id="arscene" embedded arjs='debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'>    
+          <a-assets>
+            <img id="arthumb" src="images/thumbnail.png">
+            <img id="arimage" width="320" height="176" src="assets/playbutton.png">
+          </a-assets>
+            <!-- Camera + Cursor -->
+            <a-entity id="camera" camera>
+                <a-cursor
+                cursor
+                raycaster="far: 20; interval: 1000; objects: .clickable">
+                </a-cursor>
+            </a-entity>
+            <!--a-marker id="arlinkmarker2" type='pattern' url="assets/pattern-frame.patt"-->
+            <a-marker id="arlinkmarker2" type='barcode' value='5'>  
+                <!-- Target -->
+                <!--a-box id="box2" class="clickable box" change-color-on-click button material="color: green" change-color-on-click depth="0.5" height="0.5" width="0.5"></a-box-->
+                
+                  <a-plane src="#arthumb" rotation="-90 0 0" position="0 0 0" scale="1.77 1.1 1"></a-plane>
+                  <a-image id="box2" class="clickable box" button src="#arimage" rotation="-90 0 0" position="0 0 0" scale="1.77 1.1 1"></a-image>
+                
+                <!--a-entity
+                id="box2" class="clickable box" 
+                gltf-model="assets/sustainabilitywindmill.gltf"
+                scale=".5 .5 .5"
+                animation-mixer
+                change-color-on-click
+                ytid="2ZSE9TxQ-3Q"
+                button>
+                </a-entity-->
+            </a-marker>
+            
+        </a-scene>
+    </body>
+    <script>
+       /*var arscene = document.querySelector('#arscene'); 
+        var lastIndex=0;
+        var COLORS = [
+                    'pink',
+                    'blue',
+                    'yellow',
+                    'red',
+                    'peachpuff',
+                    '#2EAFAC',
+                    '#BAE'];
+
+        arscene.addEventListener('touchstart', touchStartHandler, false);
+        
+        function touchStartHandler(evt){
+            targetEl=document.querySelector('.clickable');
+            lastIndex = (lastIndex + 1) % COLORS.length;
+            targetEl.setAttribute('material', 'color', COLORS[lastIndex]);
+                console.log('I was clicked at: ', evt.detail.intersection.point);
+            
+            goInside(gltf_box1);
+              $( "#videoDialog" ).dialog( "open" );
+              player.playVideo();
+        }*/
+        
+        /*el.setAttribute("material", {color: 'blue'});
+            if(flag){
+                targetEl.setAttribute('material', {color: 'red'});
+                flag=false;
+            }
+            else{
+                targetEl.setAttribute('material', {color: 'green'});
+                flag=true;
+            }*/
+    </script>
+</html>

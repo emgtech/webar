@@ -1,0 +1,151 @@
+<!doctype HTML>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    </head>
+    <<!-- import aframe and then ar.js with image tracking / location based features -->
+<script src="https://cdn.jsdelivr.net/gh/aframevr/aframe@1c2407b26c61958baa93967b5412487cd94b290b/dist/aframe-master.min.js"></script>
+<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.0/dist/aframe-extras.min.js"></script>
+    
+    <!-- add this script in order to load a large set of 3D model extensions-->
+    <script>
+         AFRAME.registerComponent('vidhandler', {
+        init: function () {
+          this.toggle = false;
+          document.querySelector("#arvideo").pause(); //reference to the video
+        },
+        tick:function(){  
+          if(document.querySelector("#arvideomarker").object3D.visible == true){
+            if(!this.toggle){
+              this.toggle = true;
+              //document.querySelector("#arvideo").play();
+	       //document.querySelector("#arvideo").muted=false;
+            }
+          }else{
+            this.toggle = false;
+            //document.querySelector("#arvideo").pause();
+ 	    //document.querySelector("#arvideo").muted=true;
+          }
+        }
+        });	    
+    </script>
+    <!-- style for the loader -->
+<style>
+  .arjs-loader {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .arjs-loader div {
+    text-align: center;
+    font-size: 1.25em;
+    color: white;
+  }
+</style>
+
+    <body style='margin : 0px; overflow: hidden;'>
+<!-- minimal loader shown until image descriptors are loaded. Loading may take a while according to the device computational power -->
+<div class="arjs-loader">
+  <div>Loading, please wait...</div>
+</div>
+        <!-- we add detectionMode and matrixCodeType to tell AR.js to recognize barcode markers -->
+        <a-scene id="arscene" embedded arjs='sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;'>
+            
+
+            <a-assets>
+              <video id="arvideo" width="320" height="176" controls="controls" preload muted="true" loop="true" src="https://brimmerdn.github.io/webAR/video/timelapsepainting.mp4" 
+              poster="assets/playbutton.png"></video>
+
+              <img id="arimage" width="320" height="176" src="assets/playbutton.png">
+
+            </a-assets>
+
+     <!-- a-nft is the anchor that defines an Image Tracking entity -->
+    <!-- on 'url' use the path to the Image Descriptors created before. -->
+    <!-- the path should end with the name without the extension e.g. if file is 'pinball.fset' the path should end with 'pinball' -->
+    <a-nft
+    type="nft"
+    url="webAR/assets/sustainability/sustainability"
+    smooth="true"
+    smoothCount="10"
+    smoothTolerance=".01"
+    smoothThreshold="5"
+    >
+      <!-- as a child of the a-nft entity, you can define the content to show. here's a GLTF model entity -->
+      <!-- Using the asset management system. -->
+      <a-video vidhandler src="#arvideo" rotation="-90 0 0" position="0 0 0" scale="1.77 1 1"></a-video>
+
+      <a-entity id="aimage" >
+        <a-image src="#arimage" rotation="-90 0 0" position="0 0 0" scale="1.77 1 1"></a-image>
+      </a-entity>
+
+    </a-nft>
+
+            <!-- use this <a-entity camera> to support multiple-markers, otherwise use <a-marker-camera> instead of </a-marker> -->
+            <a-entity camera></a-entity>
+ 
+
+        </a-scene>
+
+    </body>
+    <script>
+    
+      var userDevice = getMobileOperatingSystem();
+     
+      arscene = document.querySelector('#arscene'); 
+        
+      arscene.addEventListener('touchstart', touchStartHandler, false);
+	      
+	 function touchStartHandler(event){
+          if(document.querySelector('#arvideo').muted == true){
+            document.querySelector('#arvideo').muted=false;
+            document.querySelector('#arvideo').play();
+            document.querySelector('#aimage').setAttribute('visible', false);
+          } else if(document.querySelector('#arvideo').muted == false){
+            document.querySelector('#arvideo').muted=true;
+            document.querySelector('#arvideo').pause();
+            document.querySelector('#aimage').setAttribute('visible', true);
+          }
+          /*if(document.querySelector('#arvideo').play == true){
+            document.querySelector('#arvideo').play=false;
+          } else if(document.querySelector('#arvideo').play == false){
+            document.querySelector('#arvideo').play=true;
+          }*/
+        }
+      
+          
+      function getParameterByName(name) {
+          name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+          var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+              results = regex.exec(location.search);
+          return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+      }
+	
+     function getMobileOperatingSystem() {
+        var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+        // Windows Phone must come first because its UA also contains "Android"
+        if (/windows phone/i.test(userAgent)) {
+          return "Windows Phone";
+        }
+        if (/android/i.test(userAgent)) {
+          return "Android";
+        }
+        // iOS detection from: http://stackoverflow.com/a/9039885/177710
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+          return "iOS";
+        }
+        return "unknown";
+  	  }
+    
+    </script>
+</html>

@@ -1,0 +1,119 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Location Based AR.js demo</title>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js"></script>
+    <script>
+      window.onload = () => {                       navigator.geolocation.getCurrentPosition((position) => {
+        document.querySelector('a-entity').setAttribute('gps-entity-place', `latitude: ${position.coords.latitude}; longitude: ${position.coords.longitude};`)
+      });
+     }
+    </script>
+  </head>
+
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene
+      id="arscene"
+      vr-mode-ui="enabled: false"
+      embedded
+      arjs="sourceType: webcam; debugUIEnabled: false;"
+    >
+    <a-assets>
+      <img id="solar-panels" src="images/solarpanels.jpg">
+      <video id="arvideo" width="320" height="176" controls="controls" preload muted="true" loop="true" src="video/timelapsepainting.mp4" 
+                poster="assets/playbutton.png"></video>
+      <img id="arimage" width="320" height="176" src="assets/playbutton.png">
+    </a-assets>
+    <a-image src="#solar-panels" position="0 60 0" height="25" width="40"></a-image>
+
+        <a-video vidhandler src="#arvideo" rotation="0 0 0" position="60 60 0" height="25" width="40"></a-video>
+        <a-entity id="aimage">
+          <a-image src="#arimage" rotation="0 0 0" position="60 60 0" height="25" width="40"></a-image>
+        </a-entity>
+        <!--a-entity
+        geometry="primitive: plane; width: 40; height: 15"
+        material="color: #CCC"
+        text="color:#000; value: This text will be 40 units wide."
+        position="40 50 0"
+        
+        ></a-entity-->
+        <!-- Basic plane. -->
+        <a-plane color="#CCC" rotation="0 0 0" position="0 15 0" height="55" width="20"></a-plane>
+        <!-- as a child of the a-nft entity, you can define the content to show. here's a GLTF model entity -->
+        <a-entity
+            gltf-model="assets/kineticsculpture.gltf"
+            scale="2 2 2"
+            position="0 0 20"
+            animation-mixer="clip: CylinderAction; loop:repeat"
+        >
+        </a-entity>
+
+        <!-- Basic plane. -->
+        <a-plane color="#CCC" rotation="0 0 0" position="40 15 0" height="45" width="40"></a-plane>
+        <a-entity
+        gltf-model="assets/windmill.gltf"
+        scale="1 1 1"
+        position="40 0 10"
+        rotation="0 270 0"
+        animation-mixer="clip: Cube.001Action; loop:repeat">
+      </a-entity>
+
+      <a-camera gps-camera rotation-reader> </a-camera>
+    </a-scene>
+  </body>
+  <script>
+    
+    var userDevice = getMobileOperatingSystem();
+   
+    arscene = document.querySelector('#arscene'); 
+      
+    arscene.addEventListener('touchstart', touchStartHandler, false);
+      
+    function touchStartHandler(event){
+        if(document.querySelector('#arvideo').muted == true){
+          document.querySelector('#arvideo').muted=false;
+          document.querySelector('#arvideo').play();
+          document.querySelector('#aimage').setAttribute('visible', false);
+          document.querySelector('#arvideo').setAttribute('visible', true);
+        } else if(document.querySelector('#arvideo').muted == false){
+          document.querySelector('#arvideo').muted=true;
+          document.querySelector('#arvideo').pause();
+          document.querySelector('#aimage').setAttribute('visible', true);
+        }
+        /*if(document.querySelector('#arvideo').play == true){
+          document.querySelector('#arvideo').play=false;
+        } else if(document.querySelector('#arvideo').play == false){
+          document.querySelector('#arvideo').play=true;
+        }*/
+      }
+    
+        
+    function getParameterByName(name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+            results = regex.exec(location.search);
+        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    }
+  
+   function getMobileOperatingSystem() {
+      var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  
+      // Windows Phone must come first because its UA also contains "Android"
+      if (/windows phone/i.test(userAgent)) {
+        return "Windows Phone";
+      }
+      if (/android/i.test(userAgent)) {
+        return "Android";
+      }
+      // iOS detection from: http://stackoverflow.com/a/9039885/177710
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return "iOS";
+      }
+      return "unknown";
+    }
+  
+  </script>
+</html>

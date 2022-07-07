@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+  <script src="https://aframe.io/releases/0.9.2/aframe.min.js"></script>
+  <script src="https://cdn.rawgit.com/jeromeetienne/AR.js/1.7.2/aframe/build/aframe-ar.js"></script>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  <style>
+    .ui-dialog.ui-widget.ui-widget-content {
+      border: 1px solid black;
+    }
+
+    .ui-dialog .ui-widget-header {
+      border: 1px solid black;
+      background: black;
+      color: white;
+      font-weight: bold;
+    }
+
+    .ui-dialog .ui-resizable-handle {
+      background: black;
+    }
+    
+  </style>
+  <script>
+    // 2. This code loads the IFrame Player API code asynchronously.
+    var tag = document.createElement('script');
+
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    // 3. This function creates an <iframe> (and YouTube player)
+    //    after the API code downloads.
+    var player;
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: $(document).width() * 0.80 * 0.75,
+        width: $(document).width() * 0.80,
+        videoId: 'iSzq5aftaU4',
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    // 4. The API will call this function when the video player is ready.
+    function onPlayerReady(event) {
+      //event.target.playVideo();
+    }
+
+    // 5. The API calls this function when the player's state changes.
+    //    The function indicates that when playing a video (state=1),
+    //    the player should play for six seconds and then stop.
+    var done = false;
+    function onPlayerStateChange(event) {
+      
+    }
+    function stopVideo() {
+      player.stopVideo();
+    }
+  </script>
+
+  <!--<script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>-->
+  <!-- we import arjs version without NFT but with marker + location based support -->
+  <!--<script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>-->
+  <script>
+
+
+        function closeDialog() {
+          if (reload) {
+            window.location.reload();
+          } else {
+            stopVideo();
+            goOutside();
+          }
+        }
+
+        var restoreX, restoreY, restoreZ;
+        var restoreEl;
+        var reload = false;
+
+        function goInside(el) {
+
+          //Make all barrels (except el)  invisible
+          //Make all barrels and all text visible again
+          const text = document.querySelectorAll('.aText');
+          text.forEach((el) => el.setAttribute('visible', false));
+
+          const barrels = document.querySelectorAll('.barrel');
+          barrels.forEach((barrelEl) => barrelEl.setAttribute('visible', barrelEl.id === el.id));
+
+          restoreX = el.getAttribute('position').x;
+          restoreY = el.getAttribute('position').y;
+          restoreZ = el.getAttribute('position').z;
+
+          el.setAttribute('animation__2', 'property: scale; to: 50 50 50; dur: 5000; easing: linear;');
+          el.setAttribute('animation', 'property: position; to: 0 0 -150; dur: 5000; easing: linear;');
+          restoreEl = el;
+        }
+
+        function goOutside() {
+
+          setTimeout(() => {
+              //Make all barrels and all text visible again
+              const text = document.querySelectorAll('.aText');
+              text.forEach((el) => el.setAttribute('visible', true));
+
+              const barrels = document.querySelectorAll('.barrel');
+              barrels.forEach((el) => el.setAttribute('visible', true));
+
+          }, 3000);
+          
+          //Restore the position of the selected barrel
+          if (restoreEl) {
+            const restorePos = restoreX.toString() + ' ' + restoreY.toString() + ' ' + restoreZ.toString()
+            restoreEl.setAttribute('animation__2', 'property: scale; to: 1 1 1; dur: 3000; easing: linear;');
+            restoreEl.setAttribute('animation', 'property: position; to: ' + restorePos + '; dur: 3000; easing: linear;');
+          }
+          restoreEl = null;
+
+        }
+
+        AFRAME.registerComponent('button', {
+            init: function() {
+
+              //On click on the Chateau Points barrel, go to scan the dot code page
+                const gltf_coupons = document.querySelector('#animatedBarrel1');
+                const gltf_store = document.querySelector('#animatedBarrel2');
+                const gltf_brand = document.querySelector('#animatedBarrel3');
+                const gltf_loyalty = document.querySelector('#animatedBarrel4');
+                const gltf_more = document.querySelector('#animatedBarrel5');
+                const text = document.querySelectorAll('.aText');
+                const cam = document.querySelector('#camera');
+                var x = cam.getAttribute('position').x;
+                var y = cam.getAttribute('position').y;
+                var z = cam.getAttribute('position').z;
+
+                var pos = x.toString() + ' ' + (y).toString() + ' ' + (z-150).toString()
+
+                gltf_coupons.addEventListener('click', function(ev, target){
+                  goInside(gltf_coupons)
+                  $( '#dialog' ).dialog("option", "title", "About Willie's");
+                  $( '#content' ).attr("src", "https://app-less.tek-digital-dev.com/arjs/willies.html");
+                  $( "#dialog" ).dialog( "open" );
+                  //window.location = 'https://altria.tek-digital-dev.com/arjs/dotscan.html'
+                });
+
+              //On click of the Store Locator barrel, show a google map
+               
+                gltf_store.addEventListener('click', function(ev, target) {
+                  goInside(gltf_store);
+                  $( '#dialog' ).dialog("option", "title", "Store Locations");
+                  $( '#content' ).attr("src", "Maps.png");
+                  $( "#dialog" ).dialog( "open" );
+                })
+
+               
+                gltf_brand.addEventListener('click', function(ev, target) {
+                  goInside(gltf_brand);
+                  $( "#videoDialog" ).dialog( "open" );
+                  player.playVideo();
+                })
+
+                
+                gltf_loyalty.addEventListener('click', function(ev, target) {
+                  reload = true;
+                  goInside(gltf_loyalty);
+                  $( '#dialog' ).dialog("option", "title", "Product Tracing");
+                  $( '#content' ).attr("src", "https://app-less.tek-digital-dev.com/arjs/dotscan.html?cachebust=" + new Date().getTime().toString());
+                  $( "#dialog" ).dialog( "open" );
+                })
+
+               
+                gltf_more.addEventListener('click', function(ev, target) {
+                  //alert('Here');
+                  $( "#dialog" ).dialog( "open" );
+                })
+            }
+        });
+  </script>
+  <script>
+    $( function() {
+      $( "#dialog" ).dialog({
+        autoOpen: false,
+        height: $(document).height() * 0.60,
+        width: $(document).width() * 0.80,
+        close: closeDialog,
+        show: {
+          effect: "blind",
+          duration: 1000
+        },
+        hide: {
+          effect: "blind",
+          duration: 1000
+        }
+      });
+    } );
+
+    $( function() {
+      $( "#videoDialog" ).dialog({
+        autoOpen: false,
+        height: $(document).width() * 0.80 * 0.75 + 20,
+        width: $(document).width() * 0.80 + 20,
+        close: closeDialog,
+        show: {
+          effect: "blind",
+          duration: 1000
+        },
+        hide: {
+          effect: "blind",
+          duration: 1000
+        }
+      });
+    } );
+  </script>
+  <body style="margin : 0px; overflow: hidden;">
+    <div id="dialog" title="Basic dialog" style="z-index: 100">
+      <iframe id="content" src='http://williesdistillery.com' height='100%' width='100%'></iframe>
+    </div>
+    <div id="videoDialog" title="The Willie's Brand" style="z-index: 100">
+      <div id="player"></div>
+    </div>
+    <a-scene 
+        embedded 
+        arjs="trackingMethod: best; sourceType: webcam;debugUIEnabled: true; detectionMode: mono_and_matrix; matrixCodeType: 3x3_HAMMING63;"
+        >
+        <a-assets>
+          <a-asset-item id = "barrel" src = "model/wooden_barrel/scene.gltf"></a-asset-item> <!-- change to your assets -->
+        </a-assets>
+      <a-marker 
+        id="barrel-marker"  
+        type="barcode" 
+        value=3
+        size=0.03
+        smooth="true" 
+        smoothCount="10" 
+        smoothTolerance="0.01" 
+        smoothThreshold="5"
+        emitevents="true"
+        button
+      >
+        
+        <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable; useWorldCoordinates: true;"></a-entity> <!-- important for addEventListener('click'). Notice the '.clickable'-->
+        
+        <a-entity
+          class="clickable barrel" 
+          id ="animatedBarrel1"
+          position="-4 1.5 0"
+          rotation="-270 0 0"
+          gltf-model = "#barrel"
+        ></a-entity>
+        <a-entity 
+          geometry="primitive: cylinder; height: 0.7; radius: 1.5; openEnded: true; thetaStart: -45; thetaLength: 90;" 
+          material="src: About.png;  metalness: 0.9;" 
+          class="aText"  
+          position = "-4 2.2 2.1" 
+          rotation="270 0 0" 
+          scale = "0.9 1 0.7">
+        </a-entity>
+        <a-entity 
+          class="clickable barrel"
+          id="animatedBarrel2"
+          position="-4 1.5 -5"
+          rotation="-270 0 0"
+          gltf-model = "#barrel"
+        ></a-entity>
+        <a-entity 
+          geometry="primitive: cylinder; height: 0.7; radius: 1.5; openEnded: true; thetaStart: -45; thetaLength: 90;" 
+          material="src: StoreLocator.png;  metalness: 0.9;" 
+          class="aText"    
+          position = "-4 2.2 -3.1" 
+          rotation="270 0 0" 
+          scale = "0.9 1 0.7">
+        </a-entity>
+
+        <a-entity
+          class="clickable barrel"
+          id="animatedBarrel3"
+          position="0 2 -7"
+          rotation="-270 0 0"
+          gltf-model = "#barrel"
+        ></a-entity>
+        <a-entity 
+          geometry="primitive: cylinder; height: 0.7; radius: 1.5; openEnded: true; thetaStart: -45; thetaLength: 90;" 
+          material="src: Brand.png;  metalness: 0.9;" 
+          class="aText"    
+          position = "0 2.7 -5.1" 
+          rotation="270 0 0" 
+          scale = "0.9 1 0.7">
+        </a-entity>
+
+        <a-entity
+          class="clickable barrel"
+          id="animatedBarrel4"
+          position="4 1.5 -5"
+          rotation="-270 0 0"
+          gltf-model="./model/wooden_barrel/scene.gltf"
+        ></a-entity>
+        <a-entity 
+          geometry="primitive: cylinder; height: 0.7; radius: 1.5; openEnded: true; thetaStart: -45; thetaLength: 90;" 
+          material="src: Tracing.png;  metalness: 0.9;" 
+          class="aText"    
+          position = "4 2.2 -3.1" 
+          rotation="270 0 0" 
+          scale = "0.9 1 0.7">
+        </a-entity>
+
+        <a-entity
+          class="clickable barrel"
+          id="animatedBarrel5"
+          position="4 1.5 0"
+          rotation="-270 0 0"
+          gltf-model="./model/wooden_barrel/scene.gltf"
+        ></a-entity>
+        <a-entity 
+          geometry="primitive: cylinder; height: 0.7; radius: 1.5; openEnded: true; thetaStart: -45; thetaLength: 90;" 
+          material="src: More.png;  metalness: 0.9;" 
+          class="aText"    
+          position = "4 2.2 2.1" 
+          rotation="270 0 0" 
+          scale = "0.9 1 0.7">
+        </a-entity>
+
+      </a-marker>
+      <a-entity light="type: ambient; color: #CCC"></a-entity>
+      <a-entity light="type: directional; color: #FFF; intensity: 1" position="-0.5 1 10"></a-entity>
+      <a-entity id="camera" camera></a-entity>
+      
+    </a-scene>
+  </body>
+</html>
